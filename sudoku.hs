@@ -13,8 +13,10 @@ nearlySolved = [
      ]
 
 main :: IO ()
-main = putStr $ printBoard (makeBoard nearlySolved)
-                ++ "\nSolved:\n" ++ printBoard (solve nearlySolved)
+main = do
+    putStrLn $ printBoard (makeBoard nearlySolved)
+    putStrLn "Solved:"
+    putStrLn $ printBoard (solve nearlySolved)
 
 solve :: (Enum a, Eq a, Num a) => [a] -> [[a]]
 solve orig = solve_help $ makeBoard orig
