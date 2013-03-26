@@ -7,24 +7,22 @@ main :: IO ()
 main = do
     args <- getArgs
     validArg <- parseArgs args
-    putStrLn validArg
     putStrLn $ printBoard (makeBoard $ stringToInts validArg)
     putStrLn "Solved:"
     putStrLn $ printBoard (solve $ stringToInts validArg)
 
 parseArgs :: [String] -> IO String
 parseArgs args = case args of
-    [s] -> case validateArg s of
-               True  -> do { return s }
-               False -> do { putStrLn "Invalid arg";
-                             exitWith (ExitFailure 1) }
+    [s] -> if validateArg s then return s else do { putStrLn "Invalid arg";
+                                                    exitWith (ExitFailure 1) }
     _   -> do { putStrLn "Invalid number of args";
                 exitWith (ExitFailure 1) }
 
 validateArg :: String -> Bool
 validateArg arg = length arg == 81 && all (\x -> x `elem` ['0'.. '9']) arg
 
-stringToInts = map (digitToInt)
+stringToInts :: [Char] -> [Int]
+stringToInts = map digitToInt
 
 solve :: (Enum a, Eq a, Num a) => [a] -> [[a]]
 solve orig = solve_help $ makeBoard orig
@@ -51,6 +49,7 @@ update board n
                            | x <- [0.. 80]]
 
 -- Print pretty presentation of board to stdout. O represent unknown value.
+printBoard :: Show a => [[a]] -> [Char]
 printBoard board = pri_help 0
     where pri_help n
            | length board == n = ""
@@ -62,7 +61,7 @@ printBoard board = pri_help 0
                   | (n + 1) `mod` 3 == 0 = " | "
                   | otherwise = " "
                  linesep
-                  | (n `mod` 27 == 0) && (n /= 0) = "---------------------\n"
+                  | n `mod` 27 == 0 && n /= 0 = "---------------------\n"
                   | otherwise = ""
 
 -- The pos that would be affected by a change at pos n
