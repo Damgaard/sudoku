@@ -1,22 +1,30 @@
 import Data.List
-
-nearlySolved = [
-     2, 4, 8, 3, 9, 5, 7, 1, 6,
-     0, 7, 1, 6, 2, 8, 3, 4, 9,
-     9, 0, 6, 7, 4, 1, 5, 8, 2,
-     6, 8, 2, 5, 3, 9, 1, 7, 4,
-     0, 0, 9, 1, 7, 4, 6, 2, 8,
-     7, 1, 4, 8, 6, 2, 9, 5, 3,
-     8, 6, 3, 4, 1, 7, 2, 9, 5,
-     1, 9, 5, 2, 8, 6, 4, 3, 7,
-     4, 2, 7, 9, 5, 3, 8, 6, 1
-     ]
+import Data.Char
+import System.Environment
+import System.Exit
 
 main :: IO ()
 main = do
-    putStrLn $ printBoard (makeBoard nearlySolved)
+    args <- getArgs
+    validArg <- parseArgs args
+    putStrLn validArg
+    putStrLn $ printBoard (makeBoard $ stringToInts validArg)
     putStrLn "Solved:"
-    putStrLn $ printBoard (solve nearlySolved)
+    putStrLn $ printBoard (solve $ stringToInts validArg)
+
+parseArgs :: [String] -> IO String
+parseArgs args = case args of
+    [s] -> case validateArg s of
+               True  -> do { return s }
+               False -> do { putStrLn "Invalid arg";
+                             exitWith (ExitFailure 1) }
+    _   -> do { putStrLn "Invalid number of args";
+                exitWith (ExitFailure 1) }
+
+validateArg :: String -> Bool
+validateArg arg = length arg == 81 && all (\x -> x `elem` ['0'.. '9']) arg
+
+stringToInts = map (digitToInt)
 
 solve :: (Enum a, Eq a, Num a) => [a] -> [[a]]
 solve orig = solve_help $ makeBoard orig
