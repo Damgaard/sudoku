@@ -6,10 +6,11 @@ import System.Exit
 main :: IO ()
 main = do
     args <- getArgs
-    validArg <- parseArgs args
-    putStrLn $ printBoard (makeBoard $ stringToInts validArg)
-    putStrLn "Solved:"
-    putStrLn $ printBoard (solve $ stringToInts validArg)
+    validArg <- parseArgs args;
+    let board = makeBoard $ stringToInts validArg
+    putStrLn $ printBoard board;
+    putStrLn "Solved:";
+    putStrLn $ printBoard $ solve board
 
 parseArgs :: [String] -> IO String
 parseArgs args = case args of
@@ -24,11 +25,10 @@ validateArg arg = length arg == 81 && all (\x -> x `elem` ['0'.. '9']) arg
 stringToInts :: [Char] -> [Int]
 stringToInts = map digitToInt
 
-solve :: (Enum a, Eq a, Num a) => [a] -> [[a]]
-solve orig = solve_help $ makeBoard orig
-    where solve_help board
-           | isSolved board = board
-           | otherwise = solve_help $ update board 0
+solve :: Eq a => [[a]] -> [[a]]
+solve board
+    | isSolved board = board
+    | otherwise = solve $ update board 0
 
 isSolved :: [[a]] -> Bool
 isSolved = all (\x -> length x == 1)
