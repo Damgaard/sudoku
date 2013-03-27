@@ -1,15 +1,15 @@
-import Data.List
 import Data.Char
+import Data.List
 import System.Environment
 import System.Exit
 
 main :: IO ()
 main = do
     args <- getArgs
-    validArg <- parseArgs args;
+    validArg <- parseArgs args
     let board = makeBoard $ stringToInts validArg
-    putStrLn $ printBoard board;
-    putStrLn "Solved:";
+    putStrLn $ printBoard board
+    putStrLn "Solved:"
     putStrLn $ printBoard $ solve board
 
 parseArgs :: [String] -> IO String
@@ -22,7 +22,7 @@ parseArgs args = case args of
 validateArg :: String -> Bool
 validateArg arg = length arg == 81 && all (\x -> x `elem` ['0'.. '9']) arg
 
-stringToInts :: [Char] -> [Int]
+stringToInts :: String -> [Int]
 stringToInts = map digitToInt
 
 solve :: Eq a => [[a]] -> [[a]]
@@ -50,7 +50,7 @@ makeBoard :: (Enum t, Eq t, Num t) => [t] -> [[t]]
 makeBoard = map (\x -> if x == 0 then [1.. 9] else [x])
 
 -- Print pretty presentation of board to stdout. O represent unknown value.
-printBoard :: Show a => [[a]] -> [Char]
+printBoard :: Show a => [[a]] -> String
 printBoard board = pri_help 0
     where pri_help n
            | length board == n = ""
