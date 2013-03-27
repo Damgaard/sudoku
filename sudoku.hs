@@ -26,27 +26,28 @@ stringToInts :: [Char] -> [Int]
 stringToInts = map digitToInt
 
 solve :: Eq a => [[a]] -> [[a]]
-solve board
-    | isSolved board = board
-    | otherwise = solve $ update board 0
+solve orig_board = solve_help orig_board $ found orig_board
+    where solve_help board [] = board
+          solve_help board (x:xs) = solve_help (newboard 0 board) newfound
+            where affected = affectedPos x
+                  value = head (board !! x)
+                  newfound = xs ++ [y | y <- affected, length (board !! y) == 2
+                                        , value `elem` (board !! y)]
+                  newboard _ [] = []
+                  newboard pos (y:ys) = (if pos `elem` affected
+                                            then delete value y else y)
+                                         : newboard (pos + 1) ys
 
-isSolved :: [[a]] -> Bool
-isSolved = all (\x -> length x == 1)
+found :: Num a => [[a1]] -> [a]
+found board = found_help board 0
+    where found_help [] _ = []
+          found_help (x:xs) pos
+            | length x == 1 = pos : found_help xs (pos + 1)
+            | otherwise = found_help xs (pos + 1)
 
 -- Turn a list of numbers, with 0 representing unknown, into sudoku board
 makeBoard :: (Enum t, Eq t, Num t) => [t] -> [[t]]
 makeBoard = map (\x -> if x == 0 then [1.. 9] else [x])
-
-update :: Eq a => [[a]] -> Int -> [[a]]
-update board n
-    | length board == n = board
-    | length (board !! n) /= 1 = update board (n + 1)
-    | otherwise = update new_board (n + 1)
-        where value = head (board !! n)
-              new_board = [if x `elem` affectedPos n
-                            then delete value $ board !! x
-                            else board !! x
-                           | x <- [0.. 80]]
 
 -- Print pretty presentation of board to stdout. O represent unknown value.
 printBoard :: Show a => [[a]] -> [Char]
